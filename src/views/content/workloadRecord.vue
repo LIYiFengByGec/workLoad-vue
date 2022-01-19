@@ -132,7 +132,6 @@
                 this.$router.push("login")
                 return false;
             }
-            this.readerDemandList();
             this.getTableData();
         },
         methods:{
@@ -154,6 +153,7 @@
                 }else{
                     this.clearForm();
                 }
+                this.readerDemandList();
                 this.dialogFormVisible = true
             },
             submitForm(){
