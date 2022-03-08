@@ -1,7 +1,12 @@
 <template>
     <div class="contentBox">
         <div class="header">
+            <span style="font-size: 22px;">模糊搜索</span>
+            <el-input style="display: inline-block;width: 180px;margin: 0 20px" type="text" v-model="demandNameSearch"></el-input>
+            <el-button icon="el-icon-search" @click="getTableData" circle></el-button>
             <el-button  type="success" size="medium" icon="el-icon-plus" @click="showDialog">新增需求</el-button>
+            <el-checkbox style="margin-left: 20px" v-model="isFinish" @change="getTableData">查询已完成需求</el-checkbox>
+            <el-checkbox style="margin-left: 20px" v-model="isCreate" @change="getTableData">仅查询未建单</el-checkbox>
         </div>
         <el-table
                 :data="tableData"
@@ -116,13 +121,16 @@
                     demandName: '',
                     jiraAddress: '',
                     isCreate: 0,
-                    isFinish: 0
+                    isFinish: 0,
                 },
                 rule:{
                     demandName: [
                         { required: true, message: '需求标题不可为空', trigger: 'blur' }
                     ]
-                }
+                },
+                demandNameSearch: '',
+                isFinish: false,
+                isCreate: false
             }
         },
         created() {
@@ -130,9 +138,17 @@
         },
         methods:{
             getTableData(){
+                let params = {
+                    demandName: this.demandNameSearch,
+                    isFinish: this.isFinish ? 1 : 0,
+                    isCreate: this.isCreate ? 0 : null,
+                    beginTime: null,
+                    endTime:null
+                }
                 this.$http({
-                    url: this.$http.adornUrl('/demand/listDemand'),
-                    method: 'get'
+                    url: this.$http.adornUrl(`/demand/listDemand`),
+                    method: 'post',
+                    data: this.$http.adornData(params)
                 }).then(res =>{
                     this.tableData = res.data
                 })
@@ -195,7 +211,7 @@
                         this.form[key] = ''
                     }
                 })
-            }
+            },
         }
     }
 </script>

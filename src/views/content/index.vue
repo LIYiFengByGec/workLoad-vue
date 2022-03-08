@@ -66,7 +66,7 @@
         name: "index",
         data() {
             return {
-                time: dateTimeUtils.getToday().starttime,
+                time: dateTimeUtils.getBeforeDate(1),
                 pickerOptions: {
                     shortcuts: [{
                         text: '今天',

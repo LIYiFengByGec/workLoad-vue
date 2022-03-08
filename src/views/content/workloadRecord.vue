@@ -60,7 +60,7 @@
         <el-dialog :title="this.form.workloadId ? '修改工作量':'工作量填报'" :visible.sync="dialogFormVisible" width="50%" :close-on-click-modal="false">
             <el-form :model="form" :rules="rule" ref="form" status-icon>
                 <el-form-item label="对应需求" prop="workContent">
-                    <el-select style="width: 100%" v-model="form.demandId" placeholder="若此需求未建单，请留空，建单后记得补充上">
+                    <el-select style="width: 100%" v-model="form.demandId" filterable :filter-method="selectChange" placeholder="若此需求未建单，请留空，建单后记得补充上">
                         <el-option
                                 v-for="item in demandList"
                                 :key="item.demandId"
@@ -86,6 +86,7 @@
 
 <script>
     import dateTimeUtils from "../../utils/DateTimeUtils"
+    import DateTimeUtils from "../../utils/DateTimeUtils";
     export default {
         name: "workloadRecord",
         data(){
@@ -136,9 +137,15 @@
         },
         methods:{
             readerDemandList(){
+                // 填需求时只获取15天内的需求
+                let params = {
+                    beginTime: DateTimeUtils.getBeforeDate(15),
+                    endTime: DateTimeUtils.getCurrentTime(),
+                }
                 this.$http({
                     url: this.$http.adornUrl('/demand/listDemand'),
-                    method: 'get'
+                    method: 'post',
+                    data: this.$http.adornData(params)
                 }).then(res =>{
                     let arr = []
                     res.data.forEach(item => {
@@ -216,6 +223,23 @@
                     this.getTableData();
                 })
             },
+            selectChange(val){
+                // 填需求时只获取15天内的需求
+                let params = {
+                    demandName: val
+                }
+                this.$http({
+                    url: this.$http.adornUrl('/demand/listDemand'),
+                    method: 'post',
+                    data: this.$http.adornData(params)
+                }).then(res =>{
+                    let arr = []
+                    res.data.forEach(item => {
+                        arr.push({demandId: item.demandId, demandName: item.demandName})
+                    })
+                    this.demandList = arr
+                })
+            }
         }
     }
 </script>

@@ -122,6 +122,35 @@ export default {
      */
     formatTime(date){
         return moment(date).format("HH:mm:ss");
-    }
+    },
+    //  获取当前日期前后多少天的日期,时间默认0点，之前多少天传正数，后面多少天传负数，今天传0，
+//  num为传入的数字， time为传入的指定日期，如果time不传，则默认为当前时间
+
+    getBeforeDate(num, time) {
+        let n = num;
+        let d = '';
+        if(time) {
+            d = new Date(time);
+        } else {
+            d = new Date();
+        }
+        let year = d.getFullYear();
+        let mon = d.getMonth() + 1;
+        let day = d.getDate();
+        if(day <= n) {
+            if(mon > 1) {
+                mon = mon - 1;
+            } else {
+                year = year - 1;
+                mon = 12;
+            }
+        }
+        d.setDate(d.getDate() - n);
+        year = d.getFullYear();
+        mon = d.getMonth() + 1;
+        day = d.getDate();
+        let s = year + "-" + (mon < 10 ? ('0' + mon) : mon) + "-" + (day < 10 ? ('0' + day) : day) + ' 00:00:00';
+        return s;
+    },
 
 }
