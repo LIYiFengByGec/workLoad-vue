@@ -111,6 +111,7 @@
                             //一个月不用登录
                             this.$cookies.config('30d')
                             this.$cookies.set('userId', res.data.userId)
+                            this.$cookies.set('fullName', res.data.fullName)
                             this.$router.push('/index')
                         })
                     }
