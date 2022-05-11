@@ -14,28 +14,40 @@
                 stripe
                 style="width: 100%">
             <el-table-column
-                    prop="demandName"
                     label="需求标题"
                     width="350"
                     align="center">
-            </el-table-column>
-            <el-table-column
-                    label="jira地址"
-                    width="380"
-                    align="center">
                 <template slot-scope="scope">
-                    <a target="_blank" :href="scope.row.jiraAddress">{{scope.row.jiraAddress}}</a>
+                    <span :title="scope.row.remark">{{scope.row.demandName}}</span>
                 </template>
             </el-table-column>
             <el-table-column
-                    prop="modifyTime"
-                    label="编辑时间"
-                    align="center"
-                    width="180">
+                    label="jira地址"
+                    width="100"
+                    align="center">
+                <template slot-scope="scope">
+                    <a target="_blank" v-if="scope.row.jiraAddress && scope.row.jiraAddress.length > 0" :href="scope.row.jiraAddress">点击跳转</a>
+                    <span v-else>-</span>
+                </template>
             </el-table-column>
             <el-table-column
-                    label="是否建单"
-                    width="100"
+                    label="任务进度"
+                    align="center"
+            >
+                <template slot-scope="scope">
+                    <el-slider
+                            v-model="scope.row.schedule"
+                            :step="10"
+                            show-stops
+                            @change="changeSchedule(scope.row)"
+                    >
+                    </el-slider>
+                    <span>{{scope.row.schedule}}%</span>
+                </template>
+            </el-table-column>
+            <el-table-column
+                    label="是否需要建单"
+                    width="110"
                     align="center">
                 <template slot-scope="scope">
                     <el-switch
@@ -66,6 +78,12 @@
                 </template>
             </el-table-column>
             <el-table-column
+                    prop="modifyTime"
+                    label="编辑时间"
+                    align="center"
+                    width="180">
+            </el-table-column>
+            <el-table-column
                     label="操作"
                     align="center">
                 <template slot-scope="scope">
@@ -76,12 +94,15 @@
         <el-dialog :title="this.form.demandId ? '修改需求':'新增需求'" :visible.sync="dialogFormVisible" width="35%" :close-on-click-modal="false">
             <el-form :model="form" :rules="rule" ref="form" status-icon>
                 <el-form-item label="需求标题" prop="demandName">
-                    <el-input :maxlength="100" type = "textarea" show-word-limit v-model="form.demandName" autocomplete="off"></el-input>
+                    <el-input :maxlength="100" show-word-limit v-model="form.demandName" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="jira地址">
                     <el-input :maxlength="255" show-word-limit v-model="form.jiraAddress" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="是否建单">
+                <el-form-item label="备注">
+                    <el-input :maxlength="255" type = "textarea" show-word-limit v-model="form.remark" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="是否需要建单">
                     <el-switch
                             v-model="form.isCreate"
                             :active-value="1"
@@ -120,8 +141,10 @@
                 form: {
                     demandName: '',
                     jiraAddress: '',
-                    isCreate: 0,
+                    isCreate: 1,
                     isFinish: 0,
+                    remark:'',
+                    schedule: 0
                 },
                 rule:{
                     demandName: [
@@ -130,7 +153,7 @@
                 },
                 demandNameSearch: '',
                 isFinish: false,
-                isCreate: false
+                isCreate: false,
             }
         },
         created() {
@@ -163,7 +186,10 @@
                 this.$http({
                     url: this.$http.adornUrl('/demand/updateDemandFinishByDemandId/' + row.demandId),
                     method: 'get',
+                }).then(() =>{
+                    this.getTableData()
                 })
+
             },
             showDialog(demand){
                 if(demand.demandId){
@@ -202,16 +228,22 @@
                 })
 
             },
-            clearForm(){
-                Object.keys(this.form).forEach((key) => {
-                    if(typeof this.form[key] == 'number'){
-                        this.form[key] = 0
-                    }
-                    if(typeof this.form[key] == 'string'){
-                        this.form[key] = ''
-                    }
-                })
+            clearForm() {
+                this.form = {
+                    demandName: '',
+                    jiraAddress: '',
+                    isCreate: 1,
+                    isFinish: 0,
+                    remark: '',
+                    schedule: 0
+                }
             },
+            changeSchedule(row){
+                this.$http({
+                    url: this.$http.adornUrl(`/demand/updateDemandScheduleByDemandId/${row.demandId}/${row.schedule}`),
+                    method: 'get',
+                })
+            }
         }
     }
 </script>
