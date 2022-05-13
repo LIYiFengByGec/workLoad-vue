@@ -16,40 +16,9 @@
                             <el-input v-model="dataForm.password" type="password" placeholder="密码/电话号码"></el-input>
                         </el-form-item>
                         <el-form-item>
-                            <el-button class="login-btn-submit" type="success" @click="toRegister">注册</el-button>
                             <el-button class="login-btn-submit" type="primary" @click="login">登录</el-button>
                         </el-form-item>
                     </el-form>
-                    <el-dialog title="新用户注册" width="35%" :visible.sync="showRegister" :modal-append-to-body="false" :close-on-click-modal="false">
-                        <el-form :model="registerForm" label-width="90px" ref="registerForm" :rules="registerRule">
-                            <el-form-item label="姓名" prop="fullName">
-                                <el-input v-model="registerForm.fullName" placeholder="您的真实姓名">></el-input>
-                            </el-form-item>
-                            <el-form-item label="用户名" prop="username">
-                                <el-input v-model="registerForm.username" placeholder="姓_名拼音（如：zhang_san）">></el-input>
-                            </el-form-item>
-                            <el-form-item label="电话号码" prop="phoneNumber">
-                                <el-input v-model="registerForm.phoneNumber" placeholder="电话号码(作为密码)">></el-input>
-                            </el-form-item>
-                            <el-form-item label="评级" prop="level">
-                                <el-input v-model="registerForm.level" placeholder="开发等级（p6,p7,p8）">></el-input>
-                            </el-form-item>
-                            <el-form-item label="所在部门" prop="departmentId">
-                                <el-select v-model="departmentId" placeholder="请选择">
-                                    <el-option
-                                            v-for="item in departmentList"
-                                            :key="item.departmentId"
-                                            :label="item.departmentName"
-                                            :value="item.departmentId">
-                                    </el-option>
-                                </el-select>
-                            </el-form-item>
-                        </el-form>
-                        <div slot="footer" class="dialog-footer">
-                            <el-button @click="showRegister = false">取 消</el-button>
-                            <el-button type="primary" @click="register">确 定</el-button>
-                        </div>
-                    </el-dialog>
                 </div>
             </div>
         </div>
@@ -62,18 +31,9 @@
         data() {
             return {
                 showRegister: false,
-                departmentId: '',
-                departmentList: '',
                 dataForm: {
                     userName: '',
                     password: '',
-                },
-                registerForm: {
-                    fullName: '',
-                    username: '',
-                    phoneNumber: '',
-                    level: '',
-                    departmentId: ''
                 },
                 dataRule: {
                     userName: [
@@ -81,17 +41,6 @@
                     ],
                     password: [
                         { required: true, message: '密码不能为空', trigger: 'blur' }
-                    ],
-                },
-                registerRule: {
-                    fullName: [
-                        { required: true, message: '姓名不能为空', trigger: 'blur' }
-                    ],
-                    username: [
-                        { required: true, message: '用户名不能为空', trigger: 'blur' }
-                    ],
-                    phoneNumber: [
-                        { required: true, message: '手机号不能为空', trigger: 'blur' }
                     ],
                 }
             }
@@ -116,35 +65,6 @@
                         })
                     }
                 })
-            },
-            register() {
-                this.$refs['registerForm'].validate((valid) => {
-                    if(valid){
-                        this.$http({
-                            url: this.$http.adornUrl('/register'),
-                            method: 'post',
-                            data: this.$http.adornData({
-                                username: this.registerForm.username,
-                                fullName: this.registerForm.fullName,
-                                level: this.registerForm.level,
-                                phoneNumber: this.registerForm.phoneNumber,
-                                departmentId: this.departmentId
-                            })
-                        }).then(() =>{
-                            this.$message.success('注册成功')
-                            this.showRegister = false
-                        })
-                    }
-                })
-            },
-            toRegister(){
-                this.showRegister = true;
-                this.getDepartmentList();
-            },
-            getDepartmentList(){
-                // 先只考虑政务事业部
-                this.departmentList = [{departmentId: 1, departmentName: '政务事业部'}]
-                this.departmentId = 1
             }
         }
     }
